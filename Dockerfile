@@ -6,7 +6,7 @@ LABEL maintainer="aospan@jokersys.com"
 
 RUN apt-get update && apt-get install -y \
     vim iw wireless-tools \
-    dnsmasq net-tools wpasupplicant
+    dnsmasq net-tools wpasupplicant procps
 
 COPY ./entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
