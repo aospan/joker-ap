@@ -39,6 +39,9 @@ fi
 cat << EOF > /etc/wpa_supplicant.conf
 network={
 key_mgmt=WPA-PSK
+proto=WPA
+pairwise=TKIP
+group=TKIP
 mode=2
 frequency=5825
 disable_ht=0
