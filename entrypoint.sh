@@ -35,22 +35,26 @@ if [ -z $AP_NAME ]; then
   AP_NAME="joule"
 fi
 
-#wpa_supplicant config
-cat << EOF > /etc/wpa_supplicant.conf
-network={
-key_mgmt=WPA-PSK
-proto=WPA
-pairwise=TKIP
-group=TKIP
-mode=2
-frequency=5825
-disable_ht=0
-disable_ht40=0
-disable_vht=0
+#hostapd config
+cat << EOF > /etc/hostapd.conf
+wpa=2
+driver=nl80211
+hw_mode=a
+channel=36
+ieee80211n=1
+ieee80211ac=1
+auth_algs=3
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
 EOF
 
-echo "ssid=\"$AP_NAME\"" >> /etc/wpa_supplicant.conf
-echo "psk=\"$PASSWORD\"" >> /etc/wpa_supplicant.conf
-echo "}" >> /etc/wpa_supplicant.conf
+echo "ssid=$AP_NAME" >> /etc/hostapd.conf
+echo "wpa_passphrase=$PASSWORD" >> /etc/hostapd.conf
+echo "interface=$IFACE" >> /etc/hostapd.conf
 
-/sbin/wpa_supplicant -Dnl80211 -i $IFACE -c /etc/wpa_supplicant.conf
+#prophylactic iface switch to managed mode
+#will reset wlan driver to known state
+/sbin/iw wlan0 set type managed
+
+/usr/sbin/hostapd -d /etc/hostapd.conf
