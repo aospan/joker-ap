@@ -23,6 +23,10 @@ echo using wireless interface $IFACE with addr $IPADDR/$IPMASK
 echo "listen-address=$IPADDR" > /etc/dnsmasq.conf
 echo "bind-interfaces" >> /etc/dnsmasq.conf
 echo "dhcp-range=$IFACE,$SUBNET,4h" >> /etc/dnsmasq.conf
+if [ $AVOID_DNS -eq 1 ]; then
+  echo "port=5353" >> /etc/dnsmasq.conf
+  echo "dhcp-option=6,8.8.8.8,192.168.100.1" >> /etc/dnsmasq.conf
+fi
 
 #start dnsmasq
 /usr/sbin/dnsmasq -C /etc/dnsmasq.conf
@@ -39,15 +43,21 @@ fi
 cat << EOF > /etc/hostapd.conf
 wpa=2
 driver=nl80211
-hw_mode=a
-channel=36
-ieee80211n=1
-ieee80211ac=1
 auth_algs=3
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
 EOF
+
+if [ -z $MODE_B ]; then
+  echo "hw_mode=a" >> /etc/hostapd.conf
+  echo "channel=36" >> /etc/hostapd.conf
+  echo "ieee80211n=1" >> /etc/hostapd.conf
+  echo "ieee80211ac=1" >> /etc/hostapd.conf
+else
+  echo "hw_mode=b" >> /etc/hostapd.conf
+  echo "channel=11" >> /etc/hostapd.conf
+fi
 
 echo "ssid=$AP_NAME" >> /etc/hostapd.conf
 echo "wpa_passphrase=$PASSWORD" >> /etc/hostapd.conf
